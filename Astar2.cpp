@@ -40,7 +40,7 @@ struct NODE *g_popen = NULL, *g_pclosed = NULL;
 //int g_Goal[4][4]={{1,2,3},{8,0,4},{7,6,5}};                 //八数码的目标状态
 //int g_Goal[4][4] = { { 1, 8, 2 , 5 }, { 6, 7, 0 , 4 }, { 9, 10, 12,13 },{13,14,11,15} };
 int g_Goal[4][4] = { { 2, 5, 4 , 3 }, { 6, 15, 8 , 7 }, { 1, 10, 9,11 },{13,0,14,12} };
-int g_Goal[4][4] = { { 2, 5, 4 , 3 }, { 6, 15, 8 , 7 }, { 1, 10, 9,11 },{13,0,14,12} };
+//int g_Goal[4][4] = { { 1, 2, 3 , 4 }, { 5, 6, 7 , 8 }, { 9, 10, 11,12 },{13,14,15,0} };
 int k = 0;                                           //A*所得路径的节点数
 
 
@@ -58,7 +58,7 @@ struct NODE* A_star(struct NODE *s)
 		g_pclosed = AddToclosed(n, g_pclosed);        //并将结点n放入closed表
 		psubNodelist = Expand(n);                             //扩展n
 		NNNN++;
-		if (NNNN>10000){
+		if (NNNN>30000){
             s=NULL;
             return s;
 		}
@@ -166,7 +166,7 @@ int ISGoal(struct NODE *pNode)
 }
 
 //函数h,   当前结点到达目标节点的代价
-int H_Functio2(struct NODE *pNode)
+int H_Function1(struct NODE *pNode)
 {
 	int i, j, n = 0;
 	for (i = 0; i<4; i++)
@@ -180,29 +180,12 @@ int H_Functio2(struct NODE *pNode)
 	return(n);
 }
 
-int H_Function0(struct NODE *pNode)
+int H_Function(struct NODE *pNode)
 {
-	int i, j, n = 0;
-	int ig, jg;
-
-	for (i = 0; i<4; i++)
-	{
-		for (j = 0; j<4; j++)
-		{
-			for(ig=0;ig<4;ig++){
-				for(jg=0;jg<4;j++){
-					if(pNode->a[i][j] == g_Goal[ig][jg]) break;
-				}
-			}
-			n=abs(i-ig)+abs(j-jg);
-			//n为计算两状态中不同的数码个数，即代价
-			//if (pNode->a[i][j] != g_Goal[i][j])  n++;
-		}
-	}
-	return(n);
+	return(0);
 }
 
-int H_Function(struct NODE *pNode)
+int H_Function2(struct NODE *pNode)
 {
     //计算所有棋子距离目标位置的曼哈顿距离之和n
     int i ,j, n = 0;
@@ -425,7 +408,7 @@ void printNode(struct NODE *pNode)
 	for (i = 0; i<4; i++)
 	{
 		for (j = 0; j<4; j++)
-			printf("%d ", pNode->a[i][j]);
+			printf("%3d", pNode->a[i][j]);
 		printf("\n");                                             //换行
 	}                                                //按格式输出八数码
 	printf("该节点中0的位置:");
@@ -444,6 +427,7 @@ int main()
 	struct NODE *s;
 	//s=NewNode(2,8,3,1,6,4,7,0,5);                       //八数码的初始状态
 	s = NewNode(1,2,5,4,6,8,7,3,9,10,11,12,13,14,15,0);
+	//s = NewNode(1,2,3,4,5,6,7,8,9,10,0,11,13,14,15,12);
 	s = A_star(s);
 	if(!s){
         printf("未找到解！\n");
