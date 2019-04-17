@@ -40,6 +40,7 @@ struct NODE *g_popen = NULL, *g_pclosed = NULL;
 //int g_Goal[4][4]={{1,2,3},{8,0,4},{7,6,5}};                 //八数码的目标状态
 //int g_Goal[4][4] = { { 1, 8, 2 , 5 }, { 6, 7, 0 , 4 }, { 9, 10, 12,13 },{13,14,11,15} };
 int g_Goal[4][4] = { { 2, 5, 4 , 3 }, { 6, 15, 8 , 7 }, { 1, 10, 9,11 },{13,0,14,12} };
+int g_Goal[4][4] = { { 2, 5, 4 , 3 }, { 6, 15, 8 , 7 }, { 1, 10, 9,11 },{13,0,14,12} };
 int k = 0;                                           //A*所得路径的节点数
 
 
@@ -57,6 +58,10 @@ struct NODE* A_star(struct NODE *s)
 		g_pclosed = AddToclosed(n, g_pclosed);        //并将结点n放入closed表
 		psubNodelist = Expand(n);                             //扩展n
 		NNNN++;
+		if (NNNN>10000){
+            s=NULL;
+            return s;
+		}
 		printf("%d\n", NNNN);
 
 		while (psubNodelist)                               //如果n有子结点
@@ -439,7 +444,11 @@ int main()
 	struct NODE *s;
 	//s=NewNode(2,8,3,1,6,4,7,0,5);                       //八数码的初始状态
 	s = NewNode(1,2,5,4,6,8,7,3,9,10,11,12,13,14,15,0);
-	s = A_star(s);                                           //调用A*算法
+	s = A_star(s);
+	if(!s){
+        printf("未找到解！\n");
+
+	}                                           //调用A*算法
 	if (s)
 	{
 		printf("十五数码所得路径过程如下：\n");

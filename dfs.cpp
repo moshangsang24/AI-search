@@ -1,8 +1,8 @@
-﻿#include "stdafx.h"
+//﻿#include "stdafx.h"
 #include "stdlib.h"
 #include<stdio.h>
 #include<malloc.h>
-#include<time.h> 
+#include<time.h>
 struct NODE  *A_star(struct NODE *s);                    //A*算法
 struct NODE  *Expand(struct NODE *pNode);               //扩展结点
 struct NODE *Move(struct NODE *pNode, int i1, int j1);        //移动空格
@@ -22,7 +22,7 @@ struct NODE *IN(struct NODE *pNode, struct NODE *plist);    //结点在链表内
 int Equal(struct NODE *pNode, int a[3][3]);             //判断两结点是否相同
 struct NODE *NewNode(int, int, int, int, int, int, int, int, int);          //创建新结点
 
-//结点结构                                                                
+//结点结构
 struct NODE
 {
 	int  a[3][3];                                       //存放八数码的状态
@@ -67,21 +67,21 @@ struct NODE* A_star(struct NODE *s,int depth)
 			{
 				continue;
 			}
-			else 
+			else
 			{
 				//如果m不在open及closed表中
-				
+
 				if (m->father_num <= depth){
 					g_popen = AddToopen(m, g_popen);              //则把m放入open表
 				}
-				
-					
+
+
 			}
 		}
 	}
 	if (g_popen == NULL)
 		return NULL;
-	else 
+	else
 		return(s);                            //如果open表为空，返回s即空值
 }
 
@@ -245,7 +245,7 @@ struct NODE  *IN(struct NODE *pNode, struct NODE *plist)
 		if (flag == 1) break;//pNode在plist内
 		else plist = plist->pNext;
 	}
-	return plist;//返回已存在的旧结点  
+	return plist;//返回已存在的旧结点
 }
 
 
@@ -326,9 +326,9 @@ void printNode(struct NODE *pNode)
 	printf("该节点的f值是%d, h值是%d\n", pNode->f, pNode->g);
 	printf("**************************\n");*/
 }
-void main()
+int main()
 {
-	int i; 
+	int i;
 
 	clock_t start, end;
 	start = clock();
@@ -347,20 +347,21 @@ void main()
 			printf("深搜%d层未找到符合的结果\n", i);
 		}
 	}
-	end = clock();
 	printf("运行时间time=%f\n", (double)(end - start) / CLK_TCK);
 	if (s)
 	{
+	    end = clock();
 		printf("八数码所得路径过程如下：\n");
 		printf("\n");
 		printpath(s);
+		printf("运行时间time=%f\n", (double)(end - start) / CLK_TCK);
 
-	}                                 //如果s不空，输出解题路径   
+	}                                 //如果s不空，输出解题路径
 	else printf("No key\n");//否则输出“无路径”
 
-	
-	
-	
+
+
+
 	printf("深搜%d层正好找到符合的结果\n", i);
 	int g_open_len = 1;
 	while (g_popen->pNext != NULL){

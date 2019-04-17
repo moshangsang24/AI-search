@@ -2,13 +2,16 @@
 #include "stdlib.h"
 #include<stdio.h>
 #include<malloc.h>
-#include<time.h> 
+#include<time.h>
 #include<math.h>
 struct NODE  *A_star(struct NODE *s);                    //A*算法
 struct NODE  *Expand(struct NODE *pNode);               //扩展结点
 struct NODE *Move(struct NODE *pNode, int i1, int j1);        //移动空格
 int ISGoal(struct NODE *pNode);                 //判断此结点是否目标节点
-int H_Function(struct NODE *pNode);           //计算此结点到达目标的代价
+int H_Function(struct NODE *pNode);
+int GetGoal_x(int X);
+int GetGoal_y(int Y);
+         //计算此结点到达目标的代价
 //当前结点是否为其父结点的父节点
 int ISGrandFather(struct NODE *pNode, struct NODE *father);
 void printpath(struct NODE *pNode);                       //输出解题路径
@@ -23,7 +26,7 @@ struct NODE *IN(struct NODE *pNode, struct NODE *plist);    //结点在链表内
 int Equal(struct NODE *pNode, int a[3][3]);             //判断两结点是否相同
 struct NODE *NewNode(int, int, int, int, int, int, int, int, int);          //创建新结点
 int NNNN = 0;
-//结点结构                                                                
+//结点结构
 struct NODE
 {
 	int  a[3][3];                                       //存放八数码的状态
@@ -34,8 +37,8 @@ struct NODE
 };
 //全局变量open表、closed表且初始置空
 struct NODE *g_popen = NULL, *g_pclosed = NULL;
-//int g_Goal[3][3]={{1,2,3},{8,0,4},{7,6,5}};                 //八数码的目标状态
-int g_Goal[3][3] = { { 0, 4, 7 }, { 6, 5, 2 }, { 8, 3, 1 } };
+int g_Goal[3][3]={{1,2,3},{8,0,4},{7,6,5}};                 //八数码的目标状态
+//int g_Goal[3][3] = { { 0, 4, 7 }, { 6, 5, 2 }, { 8, 3, 1 } };
 int k = 0;                                           //A*所得路径的节点数
 
 
@@ -53,6 +56,10 @@ struct NODE* A_star(struct NODE *s)
 		g_pclosed = AddToclosed(n, g_pclosed);        //并将结点n放入closed表
 		psubNodelist = Expand(n);                             //扩展n
 		NNNN++;
+		if (NNNN>30000){
+            s=NULL;
+            return s;
+		}
 		printf("%d\n", NNNN);
 
 		while (psubNodelist)                               //如果n有子结点
@@ -157,7 +164,7 @@ int ISGoal(struct NODE *pNode)
 }
 
 //函数h,   当前结点到达目标节点的代价
-int H_Functio2(struct NODE *pNode)
+int H_Function2(struct NODE *pNode)
 {
 	int i, j, n = 0;
 	for (i = 0; i<3; i++)
@@ -171,28 +178,54 @@ int H_Functio2(struct NODE *pNode)
 	return(n);
 }
 
-int H_Function(struct NODE *pNode)
-{
-	int i, j, n = 0;
-	int ig, jg;
 
-	for (i = 0; i<3; i++)
-	{
-		for (j = 0; j<3; j++)
-		{
-			for(ig=0;ig<3;ig++){
-				for(jg=0;jg<3;j++){
-					if(pNode->a[i][j] == g_Goal[ig][jg]) break;
-				}
-			}
-			n=abs(i-ig)+abs(j-jg);
-			//n为计算两状态中不同的数码个数，即代价
-			//if (pNode->a[i][j] != g_Goal[i][j])  n++;
-		}
-	}
-	return(n);
+int H_Function1(struct NODE *pNode)
+{
+    //计算所有棋子距离目标位置的曼哈顿距离之和n
+    int i ,j, n = 0;
+    int g_i = 0 , g_j = 0;
+    for (i = 0; i<3 ; i++)
+    {
+        for(j = 0; j<3; j++)
+        {
+            g_i = GetGoal_x(pNode->a[i][j]);
+            g_j = GetGoal_y(pNode->a[i][j]);
+            n = n + abs(i-g_i) + abs(j-g_j);
+        }
+    }
+    return(n);
 }
 
+int H_Function(struct NODE *pNode)
+{
+    return 0;
+}
+
+int GetGoal_x(int X)
+{
+    int i ,j;
+    for (i = 0;i < 3;i++)
+    {
+        for(j = 0;j < 3 ;j++)
+        {
+            if(X == g_Goal[i][j])
+                return i;
+        }
+    }
+}
+
+int GetGoal_y(int Y)
+{
+    int i ,j;
+    for (i = 0;i < 3;i++)
+    {
+        for(j = 0;j < 3 ;j++)
+        {
+            if(Y == g_Goal[i][j])
+                return j;
+        }
+    }
+}
 
 //当前结点是否为其父结点的父辈节点
 int  ISGrandFather(struct NODE *pNode, struct NODE *father)
@@ -301,7 +334,7 @@ struct NODE  *IN(struct NODE *pNode, struct NODE *plist)
 		if (flag == 1) break;//pNode在plist内
 		else plist = plist->pNext;
 	}
-	return plist;//返回已存在的旧结点  
+	return plist;//返回已存在的旧结点
 }
 
 
@@ -382,24 +415,26 @@ void printNode(struct NODE *pNode)
 	printf("该节点的f值是%d, h值是%d\n", pNode->f, pNode->g);
 	printf("**************************\n");
 }
-void main()
+int main()
 {
 	clock_t start, end;
 	start = clock();
 
 
-
 	struct NODE *s;
-	//s=NewNode(2,8,3,1,6,4,7,0,5);                       //八数码的初始状态
-	s = NewNode(1, 2, 3, 8, 0, 4, 7, 6, 5);
-	s = A_star(s);                                           //调用A*算法
+	s=NewNode(2,8,3,1,6,4,7,0,5);                       //八数码的初始状态
+	//s = NewNode(1, 2, 3, 8, 0, 4, 7, 6, 5);
+	s = A_star(s);
+    if(!s){
+        printf("未找到解！\n");
+	}                                          //调用A*算法
 	if (s)
 	{
 		printf("八数码所得路径过程如下：\n");
 		printf("\n");
 		printpath(s);
 
-	}                                 //如果s不空，输出解题路径   
+	}                                 //如果s不空，输出解题路径
 	else printf("No key\n");//否则输出“无路径”
 
 	end = clock();

@@ -1,66 +1,66 @@
-//#include "stdafx.h"
+ï»¿//#include "stdafx.h"
 #include "stdlib.h"
 #include<stdio.h>
 #include<malloc.h>
-#include<time.h> 
-struct NODE  *A_star(struct NODE *s);                    //A*Ëã·¨
-struct NODE  *Expand(struct NODE *pNode);               //À©Õ¹½áµã
-struct NODE *Move(struct NODE *pNode, int i1, int j1);        //ÒÆ¶¯¿Õ¸ñ
-int ISGoal(struct NODE *pNode);                 //ÅĞ¶Ï´Ë½áµãÊÇ·ñÄ¿±ê½Úµã
-int H_Function(struct NODE *pNode);           //¼ÆËã´Ë½áµãµ½´ïÄ¿±êµÄ´ú¼Û
-//µ±Ç°½áµãÊÇ·ñÎªÆä¸¸½áµãµÄ¸¸½Úµã
+#include<time.h>
+struct NODE  *A_star(struct NODE *s);                    //A*ç®—æ³•
+struct NODE  *Expand(struct NODE *pNode);               //æ‰©å±•ç»“ç‚¹
+struct NODE *Move(struct NODE *pNode, int i1, int j1);        //ç§»åŠ¨ç©ºæ ¼
+int ISGoal(struct NODE *pNode);                 //åˆ¤æ–­æ­¤ç»“ç‚¹æ˜¯å¦ç›®æ ‡èŠ‚ç‚¹
+int H_Function(struct NODE *pNode);           //è®¡ç®—æ­¤ç»“ç‚¹åˆ°è¾¾ç›®æ ‡çš„ä»£ä»·
+//å½“å‰ç»“ç‚¹æ˜¯å¦ä¸ºå…¶çˆ¶ç»“ç‚¹çš„çˆ¶èŠ‚ç‚¹
 int ISGrandFather(struct NODE *pNode, struct NODE *father);
-void printpath(struct NODE *pNode);                       //Êä³ö½âÌâÂ·¾¶
-void printNode(struct NODE *pNode);                   //Êä³öÂ·¾¶ÉÏµÄ½áµã
-//½áµã·ÅÈëopen±í,ÒÀ´Î²éÕÒopen±í
+void printpath(struct NODE *pNode);                       //è¾“å‡ºè§£é¢˜è·¯å¾„
+void printNode(struct NODE *pNode);                   //è¾“å‡ºè·¯å¾„ä¸Šçš„ç»“ç‚¹
+//ç»“ç‚¹æ”¾å…¥openè¡¨,ä¾æ¬¡æŸ¥æ‰¾openè¡¨
 struct NODE  *AddToopen(struct NODE *pNode, struct NODE *pnode);
-//½áµã·ÅÈëclosed±í
+//ç»“ç‚¹æ”¾å…¥closedè¡¨
 struct NODE *AddToclosed(struct NODE *pNode, struct NODE *pnode);
-//´ÓÁ´±íÖĞÉ¾³ı½áµã
+//ä»é“¾è¡¨ä¸­åˆ é™¤ç»“ç‚¹
 struct NODE *Del(struct NODE *pNode, struct NODE *plist);
 int get_length(struct NODE *pNode);
-struct NODE *IN(struct NODE *pNode, struct NODE *plist);    //½áµãÔÚÁ´±íÄÚ
-int Equal(struct NODE *pNode, int a[3][3]);             //ÅĞ¶ÏÁ½½áµãÊÇ·ñÏàÍ¬
-struct NODE *NewNode(int, int, int, int, int, int, int, int, int);          //´´½¨ĞÂ½áµã
+struct NODE *IN(struct NODE *pNode, struct NODE *plist);    //ç»“ç‚¹åœ¨é“¾è¡¨å†…
+int Equal(struct NODE *pNode, int a[3][3]);             //åˆ¤æ–­ä¸¤ç»“ç‚¹æ˜¯å¦ç›¸åŒ
+struct NODE *NewNode(int, int, int, int, int, int, int, int, int);          //åˆ›å»ºæ–°ç»“ç‚¹
 int max_open = 0;
 int max_close = 0;
 int NNNN = 0;
-//½áµã½á¹¹                                                                
+//ç»“ç‚¹ç»“æ„
 struct NODE
 {
-	int  a[3][3];                                       //´æ·Å°ËÊıÂëµÄ×´Ì¬
-	int  i0, j0;                                       //¿Õ¸ñËùÔÚÎ»ÖÃ×ø±ê
-	int  g, f;                                                    //´ú¼Ûg,f
-	struct NODE *father;                                        //¸¸½áµã
-	struct NODE *pNext;                                        //×Ó½áµã
+	int  a[3][3];                                       //å­˜æ”¾å…«æ•°ç çš„çŠ¶æ€
+	int  i0, j0;                                       //ç©ºæ ¼æ‰€åœ¨ä½ç½®åæ ‡
+	int  g, f;                                                    //ä»£ä»·g,f
+	struct NODE *father;                                        //çˆ¶ç»“ç‚¹
+	struct NODE *pNext;                                        //å­ç»“ç‚¹
 	int depth;
 };
-//È«¾Ö±äÁ¿open±í¡¢closed±íÇÒ³õÊ¼ÖÃ¿Õ
+//å…¨å±€å˜é‡openè¡¨ã€closedè¡¨ä¸”åˆå§‹ç½®ç©º
 struct NODE *g_popen = NULL, *g_pclosed = NULL;
-//int g_Goal[3][3] = { { 1, 2, 3 }, { 8, 0, 4 }, { 7, 6, 5 } };                 //°ËÊıÂëµÄÄ¿±ê×´Ì¬
-int g_Goal[3][3] = { { 0, 4, 7 }, { 6, 5, 2 }, { 8, 3, 1 } };
-int k = 0;                                           //A*ËùµÃÂ·¾¶µÄ½ÚµãÊı
+int g_Goal[3][3] = { { 1, 2, 3 }, { 8, 0, 4 }, { 7, 6, 5 } };                 //å…«æ•°ç çš„ç›®æ ‡çŠ¶æ€
+//int g_Goal[3][3] = { { 0, 4, 7 }, { 6, 5, 2 }, { 8, 3, 1 } };
+int k = 0;                                           //A*æ‰€å¾—è·¯å¾„çš„èŠ‚ç‚¹æ•°
 
 
-//A*Ëã·¨
+//A*ç®—æ³•
 struct NODE* A_star(struct NODE *s)
 {
 	struct NODE *n = NULL, *m = NULL, *pNode = NULL, *psubNodelist = NULL;
-	g_popen = s;                                  //¿ªÊ¼½áµãs·ÅÈëopen±í
-	max_open++;//Éú³É½Úµã¼ÓÒ»
+	g_popen = s;                                  //å¼€å§‹ç»“ç‚¹sæ”¾å…¥openè¡¨
+	max_open++;//ç”ŸæˆèŠ‚ç‚¹åŠ ä¸€
 	int depth = 1;
-	g_pclosed = NULL;                                 //closed±í³õÊ¼ÖÃ¿Õ
-	while (g_popen)                                  //Èç¹ûopen±í²»Îª¿Õ
+	g_pclosed = NULL;                                 //closedè¡¨åˆå§‹ç½®ç©º
+	while (g_popen)                                  //å¦‚æœopenè¡¨ä¸ä¸ºç©º
 	{
 		NNNN++;
-		
-		
-		n = g_popen;                         //open±íµÚÒ»¸ö½áµã¸³Öµ¸ø½áµãn
-		if (ISGoal(n) == 1) return(n);           //Èç¹ûnÊÇÄ¿±ê£¬ËÑË÷³É¹¦£¬·µ»Øn
-		g_popen = g_popen->pNext;  //Èç¹ûn²»ÊÇÄ¿±ê½áµã£¬Ôò´Óopen±íÖĞÈ¡³ön
-		g_pclosed = AddToclosed(n, g_pclosed);        //²¢½«½áµãn·ÅÈëclosed±í
+
+
+		n = g_popen;                         //openè¡¨ç¬¬ä¸€ä¸ªç»“ç‚¹èµ‹å€¼ç»™ç»“ç‚¹n
+		if (ISGoal(n) == 1) return(n);           //å¦‚æœnæ˜¯ç›®æ ‡ï¼Œæœç´¢æˆåŠŸï¼Œè¿”å›n
+		g_popen = g_popen->pNext;  //å¦‚æœnä¸æ˜¯ç›®æ ‡ç»“ç‚¹ï¼Œåˆ™ä»openè¡¨ä¸­å–å‡ºn
+		g_pclosed = AddToclosed(n, g_pclosed);        //å¹¶å°†ç»“ç‚¹næ”¾å…¥closedè¡¨
 		//max_open--;
-		
+
 		if (n->depth == depth){
 			depth++;
 			printf("n->depth = %d\n", n->depth);
@@ -69,104 +69,104 @@ struct NODE* A_star(struct NODE *s)
 			printf("open length= %d,close length = %d\n", get_length(g_popen), get_length(g_pclosed));
 			printf("*****************\n");
 		}
-		psubNodelist = Expand(n);                             //À©Õ¹n
+		psubNodelist = Expand(n);                             //æ‰©å±•n
 		// if(psubNodelist){
-		//max_close++;//À©Õ¹½Úµã¼ÓÒ»
+		//max_close++;//æ‰©å±•èŠ‚ç‚¹åŠ ä¸€
 		// }
-		
-		while (psubNodelist)                               //Èç¹ûnÓĞ×Ó½áµã
+
+		while (psubNodelist)                               //å¦‚æœnæœ‰å­ç»“ç‚¹
 		{
-			m = psubNodelist;           //psubNodelistµÄµÚÒ»¸ö½áµã¸³Öµ¸ø½áµãm
-			psubNodelist = psubNodelist->pNext;        //´ÓpsubNodelistÖĞÈ¡³öm
-			//Èç¹ûmÒÑÔÚopen±íÖĞ£¬ÔòÊ¹pNodeÖ¸Ïòopen±íÖĞ¾ÉµÄm
+			m = psubNodelist;           //psubNodelistçš„ç¬¬ä¸€ä¸ªç»“ç‚¹èµ‹å€¼ç»™ç»“ç‚¹m
+			psubNodelist = psubNodelist->pNext;        //ä»psubNodelistä¸­å–å‡ºm
+			//å¦‚æœmå·²åœ¨openè¡¨ä¸­ï¼Œåˆ™ä½¿pNodeæŒ‡å‘openè¡¨ä¸­æ—§çš„m
 			if (pNode = IN(m, g_popen))
 			{
-				//printf("Ìø¹ı£¡£¡\n");
+				//printf("è·³è¿‡ï¼ï¼\n");
 				continue;
-				
-				//free(pNode);                              //ÊÍ·ÅpNode¿Õ¼ä
+
+				//free(pNode);                              //é‡Šæ”¾pNodeç©ºé—´
 			}
-			//Èç¹ûm²»ÔÚopen±í£¬ÒÑÔÚclosed±íÖĞ£¬ÔòÊ¹pNodeÖ¸Ïòclosed±íÖĞ¾ÉµÄm
+			//å¦‚æœmä¸åœ¨openè¡¨ï¼Œå·²åœ¨closedè¡¨ä¸­ï¼Œåˆ™ä½¿pNodeæŒ‡å‘closedè¡¨ä¸­æ—§çš„m
 			else if (pNode = IN(m, g_pclosed))
 			{
-				//printf("Ìø¹ı£¡£¡\n");
+				//printf("è·³è¿‡ï¼ï¼\n");
 				continue;
-				
-				//free(pNode);//ÊÍ·ÅpNode¿Õ¼ä
+
+				//free(pNode);//é‡Šæ”¾pNodeç©ºé—´
 			}
 			else
-			{//Èç¹ûm²»ÔÚopen¼°closed±íÖĞ
-				//printf("Ìí¼Ó½øopen±í\n");
-				g_popen = AddToopen(m, g_popen);              //Ôò°Ñm·ÅÈëopen±í
-				//max_open++;//Éú³É½Úµã node +1
+			{//å¦‚æœmä¸åœ¨openåŠclosedè¡¨ä¸­
+				//printf("æ·»åŠ è¿›openè¡¨\n");
+				g_popen = AddToopen(m, g_popen);              //åˆ™æŠŠmæ”¾å…¥openè¡¨
+				//max_open++;//ç”ŸæˆèŠ‚ç‚¹ node +1
 			}
 		}
 	}
-	return(s);                            //Èç¹ûopen±íÎª¿Õ£¬·µ»Øs¼´¿ÕÖµ
+	return(s);                            //å¦‚æœopenè¡¨ä¸ºç©ºï¼Œè¿”å›så³ç©ºå€¼
 }
 
 
-//À©Õ¹½áµã£¬·µ»Øºó¼Ì½ÚµãÁ´±í
+//æ‰©å±•ç»“ç‚¹ï¼Œè¿”å›åç»§èŠ‚ç‚¹é“¾è¡¨
 struct NODE *Expand(struct NODE *pNode)
 {
 	struct NODE *psubNodelist = NULL, *m = NULL;
-	int i, j, i1, j1;          //i,j±íÊ¾¿Õ¸ñÒÆ¶¯ÏòÁ¿£»i1,j1±íÊ¾ÒÆ¶¯ºó¿Õ¸ñµÄÎ»ÖÃ
+	int i, j, i1, j1;          //i,jè¡¨ç¤ºç©ºæ ¼ç§»åŠ¨å‘é‡ï¼›i1,j1è¡¨ç¤ºç§»åŠ¨åç©ºæ ¼çš„ä½ç½®
 	int dir[4][2] = { 1, 0, 0, 1, -1, 0, 0, -1 };
 	for (i = 0; i <= 3; i++)
 	{
-		
-			
-			i1 = pNode->i0 + dir[i][0];                           //È·¶¨ÒÆ¶¯ºóµÄÎ»ÖÃi1,j1
+
+
+			i1 = pNode->i0 + dir[i][0];                           //ç¡®å®šç§»åŠ¨åçš„ä½ç½®i1,j1
 			j1 = pNode->j0 + dir[i][1];
-			if (i1<0 || j1<0 || i1>2 || j1>2)                 //±£Ö¤ÇóµÃÒÆ¶¯ºóµÄÎ»ÖÃºÏ·¨
+			if (i1<0 || j1<0 || i1>2 || j1>2)                 //ä¿è¯æ±‚å¾—ç§»åŠ¨åçš„ä½ç½®åˆæ³•
 				continue;
-			m = Move(pNode, i1, j1);   //ÒÆ¶¯¿Õ¸ñµ½Î»ÖÃ(i1,j1)£¬¼´ÓÉpNodeÀ©Õ¹³öm
+			m = Move(pNode, i1, j1);   //ç§»åŠ¨ç©ºæ ¼åˆ°ä½ç½®(i1,j1)ï¼Œå³ç”±pNodeæ‰©å±•å‡ºm
 			if (IN(m, g_popen))
 			{
-				//printf("Ìø¹ı£¡£¡\n");
+				//printf("è·³è¿‡ï¼ï¼\n");
 				continue;
 
-				//free(pNode);                              //ÊÍ·ÅpNode¿Õ¼ä
+				//free(pNode);                              //é‡Šæ”¾pNodeç©ºé—´
 			}
-			//Èç¹ûm²»ÔÚopen±í£¬ÒÑÔÚclosed±íÖĞ£¬ÔòÊ¹pNodeÖ¸Ïòclosed±íÖĞ¾ÉµÄm
+			//å¦‚æœmä¸åœ¨openè¡¨ï¼Œå·²åœ¨closedè¡¨ä¸­ï¼Œåˆ™ä½¿pNodeæŒ‡å‘closedè¡¨ä¸­æ—§çš„m
 			else if (IN(m, g_pclosed))
 			{
-				//printf("Ìø¹ı£¡£¡\n");
+				//printf("è·³è¿‡ï¼ï¼\n");
 				continue;
 
-				//free(pNode);//ÊÍ·ÅpNode¿Õ¼ä
+				//free(pNode);//é‡Šæ”¾pNodeç©ºé—´
 			}
-			//printf("¿ÉÒÔ¼ÌĞø£¡£¡\n");
-			if (ISGrandFather(m, pNode))            //Èç¹ûmÊÇpNodeµÄ¸¸±²½áµã
+			//printf("å¯ä»¥ç»§ç»­ï¼ï¼\n");
+			if (ISGrandFather(m, pNode))            //å¦‚æœmæ˜¯pNodeçš„çˆ¶è¾ˆç»“ç‚¹
 			{
-				free(m);                                //Ôò·ÅÆú¸ÃÀ©Õ¹²¢ÊÍ·Åm
+				free(m);                                //åˆ™æ”¾å¼ƒè¯¥æ‰©å±•å¹¶é‡Šæ”¾m
 				continue;
 			}
-			m->father = pNode;                           //pNodeÊÇmµÄ¸¸½áµã
+			m->father = pNode;                           //pNodeæ˜¯mçš„çˆ¶ç»“ç‚¹
 			if (pNode ==NULL){
 				m->depth = 1;
 			}
 			else{
 				m->depth = pNode->depth + 1;
 			}
-			//m->g = pNode->g + 1;                           //Ôòg(m)=g(pNode)+1
+			//m->g = pNode->g + 1;                           //åˆ™g(m)=g(pNode)+1
 			//m->f = m->g + H_Function(m);                       //f(m)=g(m)+h(m)
 			m->pNext = psubNodelist;
-			psubNodelist = m;               //m·ÅÈëºó¼Ì½áµã±íÇÒ×÷ÎªµÚÒ»¸öÔªËØ
-		
+			psubNodelist = m;               //mæ”¾å…¥åç»§ç»“ç‚¹è¡¨ä¸”ä½œä¸ºç¬¬ä¸€ä¸ªå…ƒç´ 
+
 	}
-	return psubNodelist;                             //·µ»Øºó¼Ì½Úµã£¨Á´±í£©
+	return psubNodelist;                             //è¿”å›åç»§èŠ‚ç‚¹ï¼ˆé“¾è¡¨ï¼‰
 }
 
-//ÒÆ¶¯¿Õ¸ñ
+//ç§»åŠ¨ç©ºæ ¼
 struct NODE *Move(struct NODE *pNode, int i1, int j1)
 {
 	int i2, j2, i, j;
-	struct NODE *pTempNode;    //Éú³ÉĞÂ½áµã£¬×÷ÎªÒÆ¶¯¿Õ¸ñºóµÃµ½µÄĞÂ½áµã
-	//ÎªĞÂ½áµã·ÖÅä¿Õ¼ä
+	struct NODE *pTempNode;    //ç”Ÿæˆæ–°ç»“ç‚¹ï¼Œä½œä¸ºç§»åŠ¨ç©ºæ ¼åå¾—åˆ°çš„æ–°ç»“ç‚¹
+	//ä¸ºæ–°ç»“ç‚¹åˆ†é…ç©ºé—´
 	pTempNode = (struct NODE *)malloc(sizeof(struct NODE));
-	if (pTempNode == NULL)  return NULL; //Èç¹û¿Õ¼ä·ÖÅäÊ§°ÜÔò·µ»Ø¿ÕÖ¸Õë
-	//¸´ÖÆÒÆ¶¯Ç°µÄ×´Ì¬
+	if (pTempNode == NULL)  return NULL; //å¦‚æœç©ºé—´åˆ†é…å¤±è´¥åˆ™è¿”å›ç©ºæŒ‡é’ˆ
+	//å¤åˆ¶ç§»åŠ¨å‰çš„çŠ¶æ€
 	for (i = 0; i<3; i++)
 	{
 		for (j = 0; j<3; j++)
@@ -176,25 +176,25 @@ struct NODE *Move(struct NODE *pNode, int i1, int j1)
 			pTempNode->j0 = pNode->j0;
 		}
 	}
-	//¿Õ¸ñÓëÖ¸¶¨Î»ÖÃ(i1,j1)½»»»
+	//ç©ºæ ¼ä¸æŒ‡å®šä½ç½®(i1,j1)äº¤æ¢
 	i2 = pTempNode->i0;
-	j2 = pTempNode->j0;                          //ÒÆ¶¯Ç°¿Õ¸ñµÄÎ»ÖÃ(i0,j0)
+	j2 = pTempNode->j0;                          //ç§»åŠ¨å‰ç©ºæ ¼çš„ä½ç½®(i0,j0)
 	pTempNode->a[i2][j2] = pTempNode->a[i1][j1];
 	pTempNode->a[i1][j1] = 0;
 	pTempNode->i0 = i1;
 	pTempNode->j0 = j1;
-	return(pTempNode);                     //·µ»ØÒÆ¶¯¿Õ¸ñºó£¬µÃµ½ĞÂ½áµã
+	return(pTempNode);                     //è¿”å›ç§»åŠ¨ç©ºæ ¼åï¼Œå¾—åˆ°æ–°ç»“ç‚¹
 }
 
-//ÅĞ¶Ïµ±Ç°½ÚµãÊÇ·ñÎªÄ¿±ê½Úµã
+//åˆ¤æ–­å½“å‰èŠ‚ç‚¹æ˜¯å¦ä¸ºç›®æ ‡èŠ‚ç‚¹
 int ISGoal(struct NODE *pNode)
 {
 	int z;
-	z = Equal(pNode, g_Goal);               //µ÷ÓÃÅĞ¶ÏÁ½½áµãÊÇ·ñÏàÍ¬µÄº¯Êı
-	return z;                                    //ÏàÍ¬Ê±z=1£¬²»Í¬Ê±z=0
+	z = Equal(pNode, g_Goal);               //è°ƒç”¨åˆ¤æ–­ä¸¤ç»“ç‚¹æ˜¯å¦ç›¸åŒçš„å‡½æ•°
+	return z;                                    //ç›¸åŒæ—¶z=1ï¼Œä¸åŒæ—¶z=0
 }
 
-//º¯Êıh,   µ±Ç°½áµãµ½´ïÄ¿±ê½ÚµãµÄ´ú¼Û
+//å‡½æ•°h,   å½“å‰ç»“ç‚¹åˆ°è¾¾ç›®æ ‡èŠ‚ç‚¹çš„ä»£ä»·
 int H_Function(struct NODE *pNode)
 {
 	int i, j, n = 0;
@@ -202,7 +202,7 @@ int H_Function(struct NODE *pNode)
 	{
 		for (j = 0; j<3; j++)
 		{
-			//nÎª¼ÆËãÁ½×´Ì¬ÖĞ²»Í¬µÄÊıÂë¸öÊı£¬¼´´ú¼Û
+			//nä¸ºè®¡ç®—ä¸¤çŠ¶æ€ä¸­ä¸åŒçš„æ•°ç ä¸ªæ•°ï¼Œå³ä»£ä»·
 			if (pNode->a[i][j] != g_Goal[i][j])  n++;
 		}
 	}
@@ -210,29 +210,29 @@ int H_Function(struct NODE *pNode)
 }
 
 
-//µ±Ç°½áµãÊÇ·ñÎªÆä¸¸½áµãµÄ¸¸±²½Úµã
+//å½“å‰ç»“ç‚¹æ˜¯å¦ä¸ºå…¶çˆ¶ç»“ç‚¹çš„çˆ¶è¾ˆèŠ‚ç‚¹
 int  ISGrandFather(struct NODE *pNode, struct NODE *father)
 {
 	int z;
 	while (father)
 	{
-		z = Equal(pNode, father->a);    //ÅĞ¶ÏpNodeÊÇ·ñÊÇÆäfatherµÄ¸¸±²½Úµã
+		z = Equal(pNode, father->a);    //åˆ¤æ–­pNodeæ˜¯å¦æ˜¯å…¶fatherçš„çˆ¶è¾ˆèŠ‚ç‚¹
 		if (z = 0) { father = father->father; continue; }
 		else break;
 	}
 	return(z);
 }
 
-//µ±Ç°½Úµã·ÅÈëopen±í
+//å½“å‰èŠ‚ç‚¹æ”¾å…¥openè¡¨
 struct NODE  *AddToopen(struct NODE *pnode, struct NODE *pNode)
 {
-	struct NODE *p, *p1;	        //½áµã°´ÆäfÖµ´ÓĞ¡µ½´ó¼ÓÈëopen±íÖĞÅÅĞò
-	if (pNode == NULL)                                //Èç¹ûpNodeÎª¿Õ
+	struct NODE *p, *p1;	        //ç»“ç‚¹æŒ‰å…¶få€¼ä»å°åˆ°å¤§åŠ å…¥openè¡¨ä¸­æ’åº
+	if (pNode == NULL)                                //å¦‚æœpNodeä¸ºç©º
 	{
 		pNode = pnode;
 		pNode->pNext = NULL;
 	}
-	else                                             //Èç¹ûpNode²»Îª¿Õ
+	else                                             //å¦‚æœpNodeä¸ä¸ºç©º
 	{
 		p1 = pNode;
 		p = p1->pNext;
@@ -244,14 +244,14 @@ struct NODE  *AddToopen(struct NODE *pnode, struct NODE *pNode)
 		pnode->pNext = NULL;
 		//return pNode;
 	}
-	return pNode;//·µ»Øopen±í
+	return pNode;//è¿”å›openè¡¨
 }
 
 int get_length(struct NODE *plist){
 	if (plist == NULL)
 		return 0;
 	int len = 1;
-	struct NODE *p, *p1;	        //½áµã°´ÆäfÖµ´ÓĞ¡µ½´ó¼ÓÈëopen±íÖĞÅÅĞò
+	struct NODE *p, *p1;	        //ç»“ç‚¹æŒ‰å…¶få€¼ä»å°åˆ°å¤§åŠ å…¥openè¡¨ä¸­æ’åº
 	p1 = plist;
 	p = p1->pNext;
 	while (p){
@@ -261,24 +261,24 @@ int get_length(struct NODE *plist){
 	}
 	return len;
 }
-//µ±Ç°½áµã·ÅÈëclosed±í
+//å½“å‰ç»“ç‚¹æ”¾å…¥closedè¡¨
 struct NODE *AddToclosed(struct NODE *pnode, struct NODE *pNode)
 {
 	pnode->pNext = pNode;
-	pNode = pnode;                            //ĞÂ¼ÓÈëµÄ½áµã·ÅÔÚÁ´±íÇ°¶Ë
-	return pNode;                                        //·µ»Øclosed±í
+	pNode = pnode;                            //æ–°åŠ å…¥çš„ç»“ç‚¹æ”¾åœ¨é“¾è¡¨å‰ç«¯
+	return pNode;                                        //è¿”å›closedè¡¨
 }
 
 
 
-//´Ó±íÖĞÉ¾³ı½áµã
+//ä»è¡¨ä¸­åˆ é™¤ç»“ç‚¹
 struct NODE *Del(struct NODE *pNode, struct NODE *plist)
 {
 	struct NODE *p, *p1;
-	//ÈôpNodeÊÇplistµÄµÚÒ»¸ö½Úµã£¬ÔòÖ±½ÓĞŞ¸ÄnextÖ¸Õë¼´¿É
+	//è‹¥pNodeæ˜¯plistçš„ç¬¬ä¸€ä¸ªèŠ‚ç‚¹ï¼Œåˆ™ç›´æ¥ä¿®æ”¹nextæŒ‡é’ˆå³å¯
 	if (Equal(pNode, plist->a) == 1)
 		plist = plist->pNext;
-	//·ñÔò£¬Í¨¹ıÁÙÊ±Ö¸Õëp1¡¢pÀ´È·¶¨ËùÒªÉ¾³ı½áµãµÄÎ»ÖÃ
+	//å¦åˆ™ï¼Œé€šè¿‡ä¸´æ—¶æŒ‡é’ˆp1ã€pæ¥ç¡®å®šæ‰€è¦åˆ é™¤ç»“ç‚¹çš„ä½ç½®
 	else
 	{
 		p1 = plist;
@@ -301,9 +301,9 @@ struct NODE *Del(struct NODE *pNode, struct NODE *plist)
 
 
 
-//ÅĞ¶Ïµ±Ç°½áµãÊÇ·ñÔÚ±íÖĞ
+//åˆ¤æ–­å½“å‰ç»“ç‚¹æ˜¯å¦åœ¨è¡¨ä¸­
 struct NODE  *IN(struct NODE *pNode, struct NODE *plist)
-{   //Ê¹ÓÃwhileÑ­»·ÒÀ´Î±È½Ï
+{   //ä½¿ç”¨whileå¾ªç¯ä¾æ¬¡æ¯”è¾ƒ
 	int i, j, flag = 1;
 	while (plist)
 	{
@@ -318,14 +318,14 @@ struct NODE  *IN(struct NODE *pNode, struct NODE *plist)
 			}
 		if (flag == 1){
 			break;
-		}//pNodeÔÚplistÄÚ
+		}//pNodeåœ¨plistå†…
 		else plist = plist->pNext;
 	}
-	return plist;//·µ»ØÒÑ´æÔÚµÄ¾É½áµã  
+	return plist;//è¿”å›å·²å­˜åœ¨çš„æ—§ç»“ç‚¹
 }
 
 
-//ÅĞ¶Ïµ±Ç°½áµãÊÇ·ñÎª¸ø¶¨µÄ½áµã
+//åˆ¤æ–­å½“å‰ç»“ç‚¹æ˜¯å¦ä¸ºç»™å®šçš„ç»“ç‚¹
 int Equal(struct NODE *pNode, int a[3][3])
 {
 	int flag = 1;
@@ -334,75 +334,75 @@ int Equal(struct NODE *pNode, int a[3][3])
 		for (j = 0; j<3; j++)
 		{
 			if (pNode->a[i][j] != a[i][j])
-				flag = 0;                 //ÈôÄ³Ò»Î»ÖÃµÄÊıÂë²»Í¬£¬ÔòflagÖÃ0
-			if (flag == 0) break;                       //Èôflag=0,ÔòÍË³öÑ­»·
+				flag = 0;                 //è‹¥æŸä¸€ä½ç½®çš„æ•°ç ä¸åŒï¼Œåˆ™flagç½®0
+			if (flag == 0) break;                       //è‹¥flag=0,åˆ™é€€å‡ºå¾ªç¯
 		}
-	return flag;                      //ÏàÍ¬Ê±·µ»Øflag=1£¬²»Í¬Ê±·µ»Øflag=0
+	return flag;                      //ç›¸åŒæ—¶è¿”å›flag=1ï¼Œä¸åŒæ—¶è¿”å›flag=0
 }
 
 
 
-//ĞÂ½¨½áµã
+//æ–°å»ºç»“ç‚¹
 struct NODE *NewNode(int i00, int i01, int i02, int i10, int i11, int i12, int i20, int i21, int i22)
 {
 	struct NODE *pNode = NULL;
 	int i, j;
 	int bend = 0;
-	pNode = (struct NODE *) malloc(sizeof(struct NODE));  //ÎªpNode·ÖÅä¿Õ¼ä
-	if (pNode == NULL) return(NULL);         //Èô¿Õ¼ä·ÖÅäÊ§°ÜÔò·µ»Ø¿ÕÖ¸Õë
+	pNode = (struct NODE *) malloc(sizeof(struct NODE));  //ä¸ºpNodeåˆ†é…ç©ºé—´
+	if (pNode == NULL) return(NULL);         //è‹¥ç©ºé—´åˆ†é…å¤±è´¥åˆ™è¿”å›ç©ºæŒ‡é’ˆ
 	pNode->a[0][0] = i00; pNode->a[0][1] = i01; pNode->a[0][2] = i02;
 	pNode->a[1][0] = i10; pNode->a[1][1] = i11; pNode->a[1][2] = i12;
-	//ÊıÂë·ÅÈë¶ÔÓ¦Î»ÖÃ
+	//æ•°ç æ”¾å…¥å¯¹åº”ä½ç½®
 	pNode->a[2][0] = i20; pNode->a[2][1] = i21; pNode->a[2][2] = i22;
 	pNode->g = 0;
-	pNode->f = 0;                                   //´ú¼Ûg,h,fÖµ³õÊ¼ÎªÁã
+	pNode->f = 0;                                   //ä»£ä»·g,h,få€¼åˆå§‹ä¸ºé›¶
 	pNode->father = NULL;
-	pNode->pNext = NULL;                                 //ÎŞ¸¸¡¢×Ó½áµã
+	pNode->pNext = NULL;                                 //æ— çˆ¶ã€å­ç»“ç‚¹
 	for (i = 0; i<3; i++)
 		for (j = 0; j<3; j++)
 		{
 			if (pNode->a[i][j] == 0)
 			{
 				pNode->i0 = i;
-				pNode->j0 = j;                     //Ê¹ÓÃforÑ­»·È·¶¨¿Õ¸ñµÄ×ø±êi0,j0
+				pNode->j0 = j;                     //ä½¿ç”¨forå¾ªç¯ç¡®å®šç©ºæ ¼çš„åæ ‡i0,j0
 				bend = 1;
 				break;
 			}
 			if (bend == 1)
 				break;
 		}
-	return(pNode);                                     //·µ»ØĞÂ½¨µÄ½áµã
+	return(pNode);                                     //è¿”å›æ–°å»ºçš„ç»“ç‚¹
 }
 
 
 
-//Êä³ö½âÌâÂ·¾¶
+//è¾“å‡ºè§£é¢˜è·¯å¾„
 void printpath(struct NODE *pNode)
 {
-	if (pNode == NULL) return;//ÈôÎª¿Õ£¬Ôò·µ»Ø
-	printpath(pNode->father);//µİ¹éµ÷ÓÃprintpath
-	printNode(pNode);//Êä³öÂ·¾¶ÖĞµÄ½áµã
+	if (pNode == NULL) return;//è‹¥ä¸ºç©ºï¼Œåˆ™è¿”å›
+	printpath(pNode->father);//é€’å½’è°ƒç”¨printpath
+	printNode(pNode);//è¾“å‡ºè·¯å¾„ä¸­çš„ç»“ç‚¹
 }
 
-//Êä³ö½áµã
+//è¾“å‡ºç»“ç‚¹
 void printNode(struct NODE *pNode)
 {
 	int i, j;
 	k = k + 1;
-	printf("setp %d£º\n", k);
+	printf("setp %dï¼š\n", k);
 	for (i = 0; i<3; i++)
 	{
 		for (j = 0; j<3; j++)
 			printf("%d ", pNode->a[i][j]);
-		printf("\n");                                             //»»ĞĞ
-	}                                                //°´¸ñÊ½Êä³ö°ËÊıÂë
-	//printf("¸Ã½ÚµãÖĞ0µÄÎ»ÖÃ:");
-	//printf("(%d,%d)\n", pNode->i0, pNode->j0);         //Êä³ö¿Õ¸ñ¼´0µÄÎ»ÖÃ
-	////Êä³ö´ú¼Ûf,h
-	//printf("¸Ã½ÚµãµÄfÖµÊÇ%d, hÖµÊÇ%d\n", pNode->f, pNode->g);
+		printf("\n");                                             //æ¢è¡Œ
+	}                                                //æŒ‰æ ¼å¼è¾“å‡ºå…«æ•°ç 
+	//printf("è¯¥èŠ‚ç‚¹ä¸­0çš„ä½ç½®:");
+	//printf("(%d,%d)\n", pNode->i0, pNode->j0);         //è¾“å‡ºç©ºæ ¼å³0çš„ä½ç½®
+	////è¾“å‡ºä»£ä»·f,h
+	//printf("è¯¥èŠ‚ç‚¹çš„få€¼æ˜¯%d, hå€¼æ˜¯%d\n", pNode->f, pNode->g);
 	printf("**************************\n");
 }
-void main()
+int main()
 {
 
 	clock_t start, end;
@@ -412,24 +412,24 @@ void main()
 
 
 	struct NODE *s;
-	//s = NewNode(2, 8, 3, 1, 6, 4, 7, 0, 5);                       //°ËÊıÂëµÄ³õÊ¼×´Ì¬
-	s = NewNode(1, 2, 3, 8, 0, 4, 7, 6, 5);
+	s = NewNode(2, 8, 3, 1, 6, 4, 7, 0, 5);                       //å…«æ•°ç çš„åˆå§‹çŠ¶æ€
+	//s = NewNode(1, 2, 3, 8, 0, 4, 7, 6, 5);
 	s->depth= 1;
-	s = A_star(s);                                           //µ÷ÓÃA*Ëã·¨
+	s = A_star(s);                                           //è°ƒç”¨A*ç®—æ³•
 	if (s)
 	{
-		printf("°ËÊıÂëËùµÃÂ·¾¶¹ı³ÌÈçÏÂ£º\n");
+		printf("å…«æ•°ç æ‰€å¾—è·¯å¾„è¿‡ç¨‹å¦‚ä¸‹ï¼š\n");
 		printf("\n");
 		printpath(s);
-	}                                 //Èç¹ûs²»¿Õ£¬Êä³ö½âÌâÂ·¾¶   
-	else printf("No key\n");//·ñÔòÊä³ö¡°ÎŞÂ·¾¶¡±
+	}                                 //å¦‚æœsä¸ç©ºï¼Œè¾“å‡ºè§£é¢˜è·¯å¾„
+	else printf("No key\n");//å¦åˆ™è¾“å‡ºâ€œæ— è·¯å¾„â€
 
 
 
 	end = clock();
-	printf("ÔËĞĞÊ±¼ätime=%f\n", (double)(end - start) / CLK_TCK);
-	//printf("Éú³É½Úµã£º%d  ",max_open);
-	//printf("À©Õ¹½Úµã£º%d  ",max_close);
+	printf("è¿è¡Œæ—¶é—´time=%f\n", (double)(end - start) / CLK_TCK);
+	//printf("ç”ŸæˆèŠ‚ç‚¹ï¼š%d  ",max_open);
+	//printf("æ‰©å±•èŠ‚ç‚¹ï¼š%d  ",max_close);
 	/*int g_open_len = 1;
 	while (g_popen->pNext != NULL){
 	g_open_len++;
@@ -440,7 +440,7 @@ void main()
 	g_closed_len++;
 	g_pclosed = g_pclosed->pNext;
 	}
-	printf("open½ÚµãµÄ³¤¶È£º%d,close½ÚµãµÄ³¤¶È£º%d", g_open_len, g_closed_len);
+	printf("openèŠ‚ç‚¹çš„é•¿åº¦ï¼š%d,closeèŠ‚ç‚¹çš„é•¿åº¦ï¼š%d", g_open_len, g_closed_len);
 	*/
 	int g_open_len = 1;
 	int g_closed_len = 1;
@@ -457,6 +457,6 @@ void main()
 		g_pclosed = g_pclosed->pNext;
 	}
 	//printNode(g_pclosed);
-	printf("Éú³É½ÚµãµÄÊıÁ¿£º%d,À©Õ¹½ÚµãµÄÊıÁ¿£º%d\n", g_open_len, g_closed_len);
-	system("pause");//·ñÔòÊä³ö¡°ÎŞÂ·¾¶¡±
+	printf("ç”ŸæˆèŠ‚ç‚¹çš„æ•°é‡ï¼š%d,æ‰©å±•èŠ‚ç‚¹çš„æ•°é‡ï¼š%d\n", g_open_len, g_closed_len);
+	system("pause");//å¦åˆ™è¾“å‡ºâ€œæ— è·¯å¾„â€
 }
